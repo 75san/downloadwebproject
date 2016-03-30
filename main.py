@@ -25,14 +25,16 @@ def savejsfile(html,savepath):
   k = 1
   for js in r.findall(html):
     temp = re.findall(js_url_pattern,js)
-    finalpath = savepath + "/" + str(k) + ".js"
+    
     k = k + 1
     if temp:
+        
         js_url=temp[0]
         strs=js_url.split('/')
         filename=strs[len(strs)-1]
         f=urllib.urlopen(js_url)
         data = urllib.urlopen(js_url).read()
+        finalpath = savepath + "/" + filename
         jsfile = file(finalpath,"wb")  
         jsfile.write(data)  
         jsfile.close()
@@ -42,12 +44,11 @@ def savecssfile(html,savepath):
   reg = r"""href\s*="?(\S+)\.css""" 
   css = re.compile(reg)
   cslist = re.findall(css,html)
-  k = 1
   for i in cslist:
    
    t=i+".css"
-   finalpath = savepath + "/" +str(k) + ".css"
-   k = k + 1
+   filename = os.path.basename(t)
+   finalpath = savepath + "/" + filename
    
    data = urllib.urlopen(t).read()
    cssfile = file(finalpath,"wb")  
@@ -59,12 +60,26 @@ def downloadImg(html,savepath):
   reg = r"""src\s*="?(\S+)\.jpg""" 
   imgre = re.compile(reg)
   imglist = re.findall(imgre, html)
-  k=0
   for i in imglist:
     t=i+".jpg"
-    k = k + 1
     data = urllib.urlopen(t).read() 
-    finalpath = savepath +  "/" + str(k) +".jpg"
+    filename = os.path.basename(t)
+    finalpath = savepath +  "/" + filename
+    print savepath
+    f = file(finalpath,"wb") 
+    print finalpath	
+    f.write(data)  
+    f.close()
+  print imglist
+def downloadwebp(html,savepath):
+  reg = r"""src\s*="?(\S+)\.webp""" 
+  imgre = re.compile(reg)
+  imglist = re.findall(imgre, html)
+  for i in imglist:
+    t=i+".webp"
+    data = urllib.urlopen(t).read() 
+    filename = os.path.basename(t)
+    finalpath = savepath +  "/" + filename
     print savepath
     f = file(finalpath,"wb") 
     print finalpath	
@@ -78,17 +93,18 @@ if __name__ == '__main__':
      exit()
     updatetime = sys.argv[2]
     urlad = sys.argv[4]
-    curtime = time.strftime('%Y%m%d%H%M%S', time.gmtime()) 
-    savepath = sys.argv[6] + "/" +curtime
-    print savepath
-    if not os.path.exists(savepath):
-      os.makedirs(savepath)
+    
+    
     while (1) :
+     curtime = time.strftime('%Y%m%d%H%M%S', time.gmtime()) 
+     savepath = sys.argv[6] + "/" +curtime
      htm = getHtml(urlad,savepath)
      downloadImg(htm,savepath)
      savejsfile(htm,savepath)
      savecssfile(htm,savepath)
+     downloadwebp(htm,savepath)
      time.sleep(int(updatetime))
- 
+
+
 
   
